@@ -8,7 +8,7 @@ void main() {
 
 class Board {
   late List<List<String>> board;
-  int size = 8;
+  int board_size = 8;
   String empty = '.';
   String mark = '*';
   String black = '○';
@@ -17,31 +17,31 @@ class Board {
   String another = '○';
   int coinWhite = 0;
   int coinBlack = 0;
-  List<int> info = [];
+  List<int> botinfo = [];
   late Processing processor;
   Bot bot = Bot();
 
   Board() {
-    board = List.generate(size, (_) => List.filled(size, empty));
+    board = List.generate(board_size, (_) => List.filled(board_size, empty));
     board[3][3] = white;
     board[3][4] = black;
     board[4][3] = black;
     board[4][4] = white;
-    processor = Processing(board, size, mark, black, white, empty, this);
+    processor = Processing(board, board_size, mark, black, white, empty, this);
     processor.checkScore();
   }
 
-  void printBoard() {
-    print('  ${List.generate(size, (i) => i + 1).join(' ')}');
-    for (int i = 0; i < size; i++) {
+  void initialize_board() {
+    print('  ${List.generate(board_size, (i) => i + 1).join(' ')}');
+    for (int i = 0; i < board_size; i++) {
       print('${i + 1} ${board[i].join(' ')}');
     }
   }
 
   void playGameOutput() {
     while (true) {
-      makerValidMove();
-      printBoard();
+      markerValidMove();
+      initialize_board();
       print('');
       print('●: $coinWhite     ○: $coinBlack');
       print('');
@@ -81,13 +81,13 @@ class Board {
           print('Invalid move. Try again.');
         }
       } else if (current == black) {
-        info = bot.botPlay(board, mark) as List<int>;
+        botinfo = bot.botPlay(board, mark) as List<int>;
         print('$current\'s turn. Enter row:');
-        print(info[0] + 1);
+        print(botinfo[0] + 1);
         print('$current\'s turn. Enter column:');
-        print(info[1] + 1);
-        board[info[0]][info[1]] = current;
-        playValid(info[0], info[1]);
+        print(botinfo[1] + 1);
+        board[botinfo[0]][botinfo[1]] = current;
+        playValid(botinfo[0], botinfo[1]);
         processor.removeMark();
         processor.checkScore();
         processor.swapTurn();
@@ -95,9 +95,9 @@ class Board {
     }
   }
 
-  void makerValidMove() {
-    for (int i = 0; i < size; i++) {
-      for (int j = 0; j < size; j++) {
+  void markerValidMove() {
+    for (int i = 0; i < board_size; i++) {
+      for (int j = 0; j < board_size; j++) {
         if (board[i][j] == empty) {
           if (processor.canPlaceMarker(i, j, current, another)) {
             board[i][j] = mark;
@@ -114,7 +114,7 @@ class Board {
 
 class Processing {
   late List<List<String>> board;
-  int size;
+  int board_size;
   String mark;
   String black;
   String white;
@@ -130,7 +130,7 @@ class Processing {
     [1, -1],
     [1, 1],
   ];
-  Processing(this.board, this.size, this.mark, this.black, this.white,
+  Processing(this.board, this.board_size, this.mark, this.black, this.white,
       this.empty, this.game);
 
   void swapTurn() {
@@ -139,8 +139,8 @@ class Processing {
   }
 
   void removeMark() {
-    for (int i = 0; i < size; i++) {
-      for (int j = 0; j < size; j++) {
+    for (int i = 0; i < board_size; i++) {
+      for (int j = 0; j < board_size; j++) {
         if (board[i][j] == mark) {
           board[i][j] = empty;
         }
@@ -149,8 +149,8 @@ class Processing {
   }
 
   bool isGameOver() {
-    for (int i = 0; i < size; i++) {
-      for (int j = 0; j < size; j++) {
+    for (int i = 0; i < board_size; i++) {
+      for (int j = 0; j < board_size; j++) {
         if (board[i][j] == mark) return false;
       }
     }
@@ -160,8 +160,8 @@ class Processing {
   void checkScore() {
     game.coinWhite = 0;
     game.coinBlack = 0;
-    for (int i = 0; i < size; i++) {
-      for (int j = 0; j < size; j++) {
+    for (int i = 0; i < board_size; i++) {
+      for (int j = 0; j < board_size; j++) {
         if (board[i][j] == black) game.coinBlack++;
         if (board[i][j] == white) game.coinWhite++;
       }
@@ -182,9 +182,9 @@ class Processing {
     int nc = c + dc;
     bool hasOpponentBetween = false;
 
-    while (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+    while (nr >= 0 && nr < board_size && nc >= 0 && nc < board_size) {
       if (board[nr][nc] == empty || board[nr][nc] == mark) return false;
-      if (board[nr][nc] == another) {
+      if (board[nr][nc] == another) {      
         hasOpponentBetween = true;
       } else if (board[nr][nc] == current) {
         return hasOpponentBetween;
@@ -206,7 +206,7 @@ class Processing {
     int nr = r + dr;
     int nc = c + dc;
 
-    while (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+    while (nr >= 0 && nr < board_size && nc >= 0 && nc < board_size) {
       if (board[nr][nc] == empty || board[nr][nc] == mark) {
         break;
       } else if (board[nr][nc] == another) {
